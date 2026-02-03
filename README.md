@@ -1,3 +1,13 @@
+## Abstract
+
+This repository contains a minimal research testbed demonstrating **decision-bound execution** and **failure-aware auditability** in transaction systems.
+
+Instead of assuming that policy/compliance decisions, execution, and anchoring occur reliably and synchronously, this artefact models anchoring as an **asynchronous, failure-prone process** and shows how violations such as replay, TOCTOU (time-of-check vs time-of-use), and anchoring suppression become **externally observable** through set reconciliation between execution logs and anchor logs.
+
+The system enforces that a cryptographically bound decision receipt must exist before execution, while a watcher component detects missing anchors after a deadline, turning anchoring failures into verifiable evidence rather than silent integrity loss.
+
+The testbed is intentionally small, runnable in minutes, and designed as a teaching and research artefact for applied systems security, auditability, and transparency mechanisms.
+
 ## Research summary (what this artefact shows)
 
 This testbed demonstrates **decision-bound execution** with **failure-aware auditability**.
