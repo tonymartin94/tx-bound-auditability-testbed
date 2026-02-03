@@ -23,25 +23,23 @@ UNDECIDED → DECIDED → EXECUTED → ANCHORED
 Anchoring is asynchronous and may fail. The system detects these failures by reconciling executed transactions against anchored commitments.
 ## System diagram
 
+## System diagram
+
 ```mermaid
 flowchart LR
-  C[Client] -->|payload| D[DecisionService]
-  D -->|receipt: hmac, commit| C
-  C -->|receipt and payload| E[ExecutionService]
-  E -->|append| X[(Executions log)]
-  E -->|enqueue commit| A[AnchorWorker]
-  A -->|append maybe delayed| Y[(Anchors log)]
-  W[Watcher] -->|reconcile after deadline| X
-  W -->|read| Y
-  W -->|report missing anchors| R[Findings]
+    U[UNDECIDED] --> D[DECIDED]
+    D --> E[EXECUTED]
+    E --> A[ANCHORED]
 
-
-
-stateDiagram-v2
-  [*] --> UNDECIDED
-  UNDECIDED --> DECIDED: receipt issued
-  DECIDED --> EXECUTED: receipt verified
-  EXECUTED --> ANCHORED: commit anchored async
+    C[Client] -->|payload| DS[DecisionService]
+    DS -->|receipt| C
+    C -->|receipt and payload| ES[ExecutionService]
+    ES --> X[(Executions log)]
+    ES --> AW[AnchorWorker]
+    AW --> Y[(Anchors log)]
+    W[Watcher] -->|reconcile after deadline| X
+    W --> Y
+    W --> R[Missing anchor findings]
 
 ## Security Properties Demonstrated
 
