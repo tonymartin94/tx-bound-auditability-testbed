@@ -24,22 +24,24 @@ Anchoring is asynchronous and may fail. The system detects these failures by rec
 ## System diagram
 
 ## System diagram
+## System diagram
 
 ```mermaid
 flowchart LR
-    U[UNDECIDED] --> D[DECIDED]
-    D --> E[EXECUTED]
-    E --> A[ANCHORED]
+  U[UNDECIDED] --> D[DECIDED]
+  D --> E[EXECUTED]
+  E --> A[ANCHORED]
 
-    C[Client] -->|payload| DS[DecisionService]
-    DS -->|receipt| C
-    C -->|receipt and payload| ES[ExecutionService]
-    ES --> X[(Executions log)]
-    ES --> AW[AnchorWorker]
-    AW --> Y[(Anchors log)]
-    W[Watcher] -->|reconcile after deadline| X
-    W --> Y
-    W --> R[Missing anchor findings]
+  Client --> DecisionService
+  DecisionService --> Client
+  Client --> ExecutionService
+  ExecutionService --> ExecLog
+  ExecutionService --> AnchorWorker
+  AnchorWorker --> AnchorLog
+  Watcher --> ExecLog
+  Watcher --> AnchorLog
+  Watcher --> Findings
+
 
 ## Security Properties Demonstrated
 
