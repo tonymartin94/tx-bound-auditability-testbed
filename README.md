@@ -25,22 +25,23 @@ Anchoring is asynchronous and may fail. The system detects these failures by rec
 
 ```mermaid
 flowchart LR
-  C[Client / Transaction initiator] -->|payload| D[DecisionService]
-  D -->|receipt (HMAC + commit)| C
-  C -->|receipt + payload| E[ExecutionService]
-  E -->|append| X[(Executions log - SQLite)]
+  C[Client] -->|payload| D[DecisionService]
+  D -->|receipt: hmac, commit| C
+  C -->|receipt and payload| E[ExecutionService]
+  E -->|append| X[(Executions log)]
   E -->|enqueue commit| A[AnchorWorker]
-  A -->|append (maybe delayed/suppressed)| Y[(Anchors log - SQLite)]
-  W[Watcher] -->|reconcile (Executions minus Anchors) after deadline| X
+  A -->|append maybe delayed| Y[(Anchors log)]
+  W[Watcher] -->|reconcile after deadline| X
   W -->|read| Y
-  W -->|flags missing anchors| R[Findings]
+  W -->|report missing anchors| R[Findings]
+
 
 
 stateDiagram-v2
   [*] --> UNDECIDED
-  UNDECIDED --> DECIDED: decision receipt issued
-  DECIDED --> EXECUTED: receipt verified and payload hash matches
-  EXECUTED --> ANCHORED: anchor worker writes commit (async)
+  UNDECIDED --> DECIDED: receipt issued
+  DECIDED --> EXECUTED: receipt verified
+  EXECUTED --> ANCHORED: commit anchored async
 
 ## Security Properties Demonstrated
 
