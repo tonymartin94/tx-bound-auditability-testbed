@@ -21,26 +21,28 @@ This repository contains a minimal, runnable research artefact demonstrating how
 UNDECIDED → DECIDED → EXECUTED → ANCHORED
 
 Anchoring is asynchronous and may fail. The system detects these failures by reconciling executed transactions against anchored commitments.
-## System diagram
+## System diagram (text)
 
-## System diagram
-## System diagram
+Transaction lifecycle:
 
-```mermaid
-flowchart LR
-  U[UNDECIDED] --> D[DECIDED]
-  D --> E[EXECUTED]
-  E --> A[ANCHORED]
+UNDECIDED -> DECIDED -> EXECUTED -> ANCHORED
 
-  Client --> DecisionService
-  DecisionService --> Client
-  Client --> ExecutionService
-  ExecutionService --> ExecLog
-  ExecutionService --> AnchorWorker
-  AnchorWorker --> AnchorLog
-  Watcher --> ExecLog
-  Watcher --> AnchorLog
-  Watcher --> Findings
+Component view:
+
+Client
+  |
+  v
+DecisionService  --->  issues signed decision receipt
+  |
+  v
+ExecutionService --->  writes to Executions log (SQLite)
+  |
+  v
+AnchorWorker     --->  writes to Anchors log (async, may fail)
+  
+Watcher compares:
+Executions log  VS  Anchors log
+and flags commits missing after a deadline.
 
 
 ## Security Properties Demonstrated
