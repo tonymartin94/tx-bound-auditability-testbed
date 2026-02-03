@@ -1,12 +1,46 @@
+## Research summary (what this artefact shows)
+
+This testbed demonstrates **decision-bound execution** with **failure-aware auditability**.
+
+A transaction must present a cryptographically bound **decision receipt** before it can execute.  
+Anchoring is **asynchronous** and may be delayed or suppressed; instead of assuming anchors always exist, the system makes anchoring failures **externally observable** via **set reconciliation**:
+
+- **Executions log**: what actually executed
+- **Anchors log**: what became publicly committed
+- **Watcher**: flags executed commits missing from anchors after a deadline
+
+The demo includes explicit scenarios for **Replay**, **TOCTOU**, and **Suppression**, showing which violations are blocked vs which become detectably abnormal.
+
 # Decision-Bound Execution + Failure-Aware Auditability (Python Research Testbed)
 
 This repository contains a minimal, runnable research artefact demonstrating how to bind policy/compliance decisions to transaction execution and make anchoring failures externally observable.
 
 ## Core Idea
 
+
 UNDECIDED → DECIDED → EXECUTED → ANCHORED
 
 Anchoring is asynchronous and may fail. The system detects these failures by reconciling executed transactions against anchored commitments.
+## System diagram
+
+```mermaid
+flowchart LR
+  C[Client / Transaction initiator] -->|payload| D[DecisionService]
+  D -->|receipt (HMAC + commit)| C
+  C -->|receipt + payload| E[ExecutionService]
+  E -->|append| X[(Executions log - SQLite)]
+  E -->|enqueue commit| A[AnchorWorker]
+  A -->|append (maybe delayed/suppressed)| Y[(Anchors log - SQLite)]
+  W[Watcher] -->|reconcile (Executions minus Anchors) after deadline| X
+  W -->|read| Y
+  W -->|flags missing anchors| R[Findings]
+
+
+stateDiagram-v2
+  [*] --> UNDECIDED
+  UNDECIDED --> DECIDED: decision receipt issued
+  DECIDED --> EXECUTED: receipt verified and payload hash matches
+  EXECUTED --> ANCHORED: anchor worker writes commit (async)
 
 ## Security Properties Demonstrated
 
