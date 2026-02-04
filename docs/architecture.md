@@ -1,115 +1,163 @@
 # Architecture and Security Model
 
-This testbed implements a minimal system to demonstrate **decision-bound execution** and **failure-aware auditability**.
+This research artefact implements a minimal system to demonstrate a security property we call:
 
-The goal is not to prevent all failures, but to make violations and suppression **externally observable and non-deniable**.
+> **Decision-Bound Execution with Failure-Aware Auditability**
+
+The goal is not to build a product system, but to model a class of systems where:
+
+- A policy / compliance / authorisation decision must exist **before** execution
+- Each decision is cryptographically bound to transaction-scoped evidence
+- Anchoring of that evidence is asynchronous and may fail
+- Failures do not silently break integrity — they become **externally observable signals**
+
+This shifts the traditional view of anchoring from *integrity guarantee* to *failure observability mechanism*.
 
 ---
 
-## 1. State Machine
+## 1. State Machine Model
 
-Every transaction follows this lifecycle:
+Every transaction follows the lifecycle:
 
 UNDECIDED → DECIDED → EXECUTED → ANCHORED
 
-- **UNDECIDED**: no policy/compliance decision exists yet
-- **DECIDED**: a cryptographically bound decision receipt is issued
-- **EXECUTED**: execution only allowed if receipt is valid and payload matches
-- **ANCHORED**: commit of the decision is appended to an immutable-ish log asynchronously
+- **UNDECIDED** — no authorisation exists
+- **DECIDED** — a cryptographically bound receipt is issued
+- **EXECUTED** — execution requires receipt verification and payload consistency
+- **ANCHORED** — a commitment to the decision is appended asynchronously to an append-only log
 
-Anchoring is intentionally asynchronous and may fail.
+The critical design choice is that **ANCHORED is not required for execution**.
+
+Instead, the absence of anchoring becomes meaningful.
 
 ---
 
-## 2. Components
+## 2. System Components as Security Roles
 
-### DecisionService
-Issues a **DecisionReceipt** containing:
+### DecisionService — *Evidence Creator*
 
-- tx_id
-- decision (APPROVE / REJECT)
-- decided_at timestamp
-- policy_version
-- payload_hash
+Produces a **DecisionReceipt** binding:
+
+- transaction identifier
+- decision outcome
+- payload hash (what was checked)
+- policy version
 - nonce
 - commit hash
-- HMAC over the receipt
+- HMAC authenticity
 
-This binds *what was checked* to *what must be executed*.
+This creates **transaction-scoped cryptographic evidence**.
 
 ---
 
-### ExecutionService
+### ExecutionService — *Invariant Enforcer*
 
-Enforces:
+Enforces the core invariants:
 
 - Decision-before-execution
-- Replay resistance (tx_id can execute only once)
-- TOCTOU protection (payload hash must match receipt)
-- Records all attempts into the **Executions log**
+- Replay resistance (tx_id uniqueness)
+- TOCTOU resistance (payload must match decision)
+- Records all attempts in an **Executions log**
 
-This log represents **what the system claims happened**.
+This log represents:
+
+> *What the system claims happened*
 
 ---
 
-### AnchorWorker
+### AnchorWorker — *Asynchronous Committer*
 
-Takes commit hashes from executed transactions and writes them to the **Anchors log**.
+Writes commit hashes to an **Anchors log** simulating:
 
-This simulates anchoring to an immutable system (e.g., blockchain, transparency log).
+- transparency logs
+- blockchains
+- append-only audit systems
 
 Anchoring may be:
+
 - delayed
 - dropped (suppression)
 - successful
 
+This behaviour is intentional for modelling adversarial conditions.
+
 ---
 
-### Watcher
+### Watcher — *External Auditor*
 
-Continuously reconciles:
+Performs **set reconciliation**:
 
 Executions log  VS  Anchors log
 
-If an executed commit does not appear in the anchors log after a deadline, it is flagged as:
+If an executed commit does not appear in anchors after a deadline, it flags:
 
 **MISSING_ANCHOR_AFTER_DEADLINE**
 
-This is the core of **failure-aware auditability**.
+This is the mechanism that turns anchoring failure into evidence.
 
 ---
 
-## 3. Logs as Evidence
+## 3. Logs as Evidence, Not Storage
 
-| Log | Meaning |
-|----|----|
-| Executions | What the system says was executed |
+| Log | Represents |
+|-----|------------|
+| Executions | What the system asserts occurred |
 | Anchors | What was externally committed |
-| Watcher findings | Evidence of suppression or delay |
+| Watcher findings | Evidence of suppression, delay, or failure |
 
-The security property emerges from comparing these logs.
+Security does not come from any single log, but from **their comparison**.
 
 ---
 
-## 4. Attacks Demonstrated
+## 4. Adversary Model
+
+Rational operator adversary:
+
+- May attempt replay, suppression, or TOCTOU
+- Cannot break cryptographic primitives
+- Cannot rewrite the anchor log once written
+- Can delay or drop anchoring
+
+This reflects realistic operational threats rather than theoretical attackers.
+
+---
+
+## 5. Attacks Demonstrated
 
 ### Replay
-Same tx_id reused → execution blocked and logged.
+Reusing tx_id → execution blocked and recorded.
 
 ### TOCTOU
-Decision made on payload A, execution attempts payload B → blocked and logged.
+Decision on payload A, execution attempts payload B → blocked and recorded.
 
 ### Suppression
-Execution occurs but commit never appears in anchors → detected by watcher.
+Execution occurs, but commit never appears in anchors → detected by watcher.
 
 ---
 
-## 5. Security Insight
+## 6. Key Security Insight
 
 Traditional systems assume:
-> “If anchoring fails, we lose integrity.”
 
-This testbed demonstrates:
-> “If anchoring fails, we gain evidence of failure.”
+> “If anchoring fails, integrity is lost.”
 
-That is the key research insight.
+This model demonstrates:
+
+> **If anchoring fails, integrity violations become observable and non-deniable.**
+
+This is the core contribution of the artefact.
+
+---
+
+## 7. Why This Is a Systems Security Problem
+
+This model applies wherever:
+
+- decisions precede actions
+- auditability is required
+- anchoring is unreliable or delayed
+- privacy requires minimal data disclosure
+
+Examples include fintech, supply chains, healthcare workflows, robotics control, and regulatory systems.
+
+The artefact is intentionally minimal to expose the security properties clearly.
