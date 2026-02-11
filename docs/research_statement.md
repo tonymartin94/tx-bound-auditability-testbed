@@ -23,13 +23,13 @@ This direction sits at the intersection of:
 
 Many real-world systems — financial systems, regulatory platforms, healthcare workflows, supply chains, robotics control, and distributed services — rely on a common pattern:
 
-> A decision is made, and later an action is executed based on that decision.
+ A decision is made, and later an action is executed based on that decision.
 
 However, these systems often assume that audit logs, transparency logs, or blockchains will reliably record evidence of those decisions. When anchoring fails, is delayed, or is suppressed, the integrity of the system quietly degrades.
 
 I am interested in a different question:
 
-> Can systems be designed such that anchoring failures themselves become detectable signals of abnormal behaviour?
+ Can systems be designed such that anchoring failures themselves become detectable signals of abnormal behaviour?
 
 ---
 
@@ -64,7 +64,7 @@ Traditional systems treat anchoring as an integrity guarantee.
 
 My work explores a different model:
 
-> Anchoring as a mechanism for failure-aware auditability.
+ Anchoring as a mechanism for failure-aware auditability.
 
 Instead of assuming perfect logs, the system gains security properties from the comparison between:
 
@@ -96,4 +96,4 @@ I am particularly interested in working with groups researching:
 
 My goal is to pursue doctoral research focused on designing systems where:
 
-> Security is derived not from assuming components always work, but from making their failures observable, attributable, and non-deniable.
+ Security is derived not from assuming components always work, but from making their failures observable, attributable, and non-deniable.
