@@ -89,7 +89,7 @@ I am particularly interested in working with groups researching:
 - Trustworthy distributed systems
 - Security of cyber-physical and socio-technical systems
 
----
+
 
 ## Goal
 
