@@ -73,7 +73,6 @@ Instead of assuming perfect logs, the system gains security properties from the 
 ---
 
 ## Future Research Direction
-
 I would like to extend this work into:
 
 - Formal modelling of decision-bound systems
