@@ -1,5 +1,4 @@
 # Research Statement — Tony Martin
-
 ## Research Interest
 
 My research interest lies in **systems security at the intersection of decision processes, cryptographic evidence, and auditability under failure**.
