@@ -2,7 +2,7 @@
 
 This research artefact implements a minimal system to demonstrate a security property we call:
 
-> **Decision-Bound Execution with Failure-Aware Auditability**
+ **Decision-Bound Execution with Failure-Aware Auditability**
 
 The goal is not to build a product system, but to model a class of systems where:
 
@@ -61,7 +61,7 @@ Enforces the core invariants:
 
 This log represents:
 
-> *What the system claims happened*
+ *What the system claims happened*
 
 ---
 
@@ -139,11 +139,11 @@ Execution occurs, but commit never appears in anchors → detected by watcher.
 
 Traditional systems assume:
 
-> “If anchoring fails, integrity is lost.”
+ “If anchoring fails, integrity is lost.”
 
 This model demonstrates:
 
-> **If anchoring fails, integrity violations become observable and non-deniable.**
+ **If anchoring fails, integrity violations become observable and non-deniable.**
 
 This is the core contribution of the artefact.
 
