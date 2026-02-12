@@ -2,9 +2,6 @@
 __pycache__/
 *.pyc
 
-# Local DB (must never be committed)
-tbed.sqlite
-
 # Virtual env
 .venv/
 env/
@@ -12,3 +9,7 @@ env/
 # OS
 Thumbs.db
 .DS_Store
+
+# Local DBs / outputs (never commit)
+*.sqlite
+results/

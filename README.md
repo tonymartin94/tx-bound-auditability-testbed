@@ -81,3 +81,20 @@ The program prints:
 - Watcher results (missing anchors after deadline)
 
 See docs/threat_model.md for the threat model.
+
+## Experimental Harness (for paper Section 6–7)
+
+This repository includes a reproducible experimental harness that evaluates bounded-time detectability under anchoring suppression.
+
+Run:
+
+python -m experiments.bench_experiments
+
+This will:
+- issue N transactions,
+- execute approved transactions,
+- anchor asynchronously with configurable delay and suppression probability,
+- run the watcher after a reconciliation deadline Δ,
+- write per-transaction outcomes to results/results.csv (ignored by git),
+- store the run database under results/ (ignored by git).
+
