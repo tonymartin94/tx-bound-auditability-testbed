@@ -82,7 +82,7 @@ The program prints:
 
 See docs/threat_model.md for the threat model.
 
-## Experimental Harness (for paper Section 6–7)
+## Experimental Harness 
 
 This repository includes a reproducible experimental harness that evaluates bounded-time detectability under anchoring suppression.
 
